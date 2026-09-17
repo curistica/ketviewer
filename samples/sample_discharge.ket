@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SYNTHETIC TEST DATA. Invented patient, fictional places, and an NHS
+     number from the 999 000 0000-999 999 9999 range that NHS England
+     reserves for test data. Not a real person or record. -->
+<ReportMsg>
+    <Header>
+        <MessageID>ED-DISCH-55012</MessageID>
+        <SourceSystem>Wellford General Hospital Emergency Department</SourceSystem>
+        <DestinationODS>X99999</DestinationODS>
+        <CreationDateTime>2026-09-13T23:58:00</CreationDateTime>
+    </Header>
+    <Patient>
+        <NHSNumber>9997770005</NHSNumber>
+        <Surname>ROE</Surname>
+        <Forenames>Liam</Forenames>
+        <DateOfBirth>2014-02-08</DateOfBirth>
+        <Gender>1</Gender>
+        <RegisteredGPCode>X99999</RegisteredGPCode>
+    </Patient>
+    <Encounter>
+        <EncounterDateTime>2026-09-13T20:12:00</EncounterDateTime>
+        <ClinicianName>Dr. J. Bloggs</ClinicianName>
+        <ClinicianType>ED Registrar</ClinicianType>
+        <PresentationType>Emergency Department Attendance</PresentationType>
+    </Encounter>
+    <Payload contentType="application/pdf" encoding="base64">
+JVBERi0xLjQKMSAwIG9iajw8L1R5cGUvQ2F0YWxvZy9QYWdlcyAyIDAgUj4+ZW5kb2JqCjIgMCBv
+Ymo8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PmVuZG9iagozIDAgb2JqPDwvVHlw
+ZS9QYWdlL1BhcmVudCAyIDAgUi9NZWRpYUJveFswIDAgMjAwIDEwMF0+PmVuZG9iagp0cmFpbGVy
+PDwvUm9vdCAxIDAgUj4+CiUlRU9GCg==
+    </Payload>
+</ReportMsg>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SYNTHETIC TEST DATA. Invented patient, fictional places, and an NHS
+     number from the 999 000 0000-999 999 9999 range that NHS England
+     reserves for test data. Not a real person or record. -->
+<ITKMessage xmlns="urn:nhs-itk:ns:201005">
+    <MessageHeader>
+        <MessageId>ITK-2026-0914-0031</MessageId>
+        <SendingSystem>NHS 111 (Provider: Example Region)</SendingSystem>
+        <DestinationODS>X99999</DestinationODS>
+        <MessageDateTime>2026-09-14T08:02:11</MessageDateTime>
+        <Priority>Routine</Priority>
+    </MessageHeader>
+    <PatientDetails>
+        <NHSNo>9994560018</NHSNo>
+        <Title>Mrs</Title>
+        <Surname>BLOGGS</Surname>
+        <Forenames>Amara Ruth</Forenames>
+        <DOB>1951-11-30</DOB>
+        <Sex>2</Sex>
+        <Address>
+            <Line1>Flat 4</Line1>
+            <Line2>Example Court</Line2>
+            <Town>Marchbourne</Town>
+            <Postcode>ZZ9 9TT</Postcode>
+        </Address>
+        <Telephone>07700 900123</Telephone> <!-- Ofcom reserved drama range -->
+        <RegisteredGPCode>X99999</RegisteredGPCode>
+    </PatientDetails>
+    <Consultation>
+        <ContactDateTime>2026-09-14T07:41:00</ContactDateTime>
+        <Clinician>A. Roe</Clinician>
+        <ClinicianType>111 Health Advisor</ClinicianType>
+        <PresentationType>Telephone Triage</PresentationType>
+        <DispositionCode>Dx06</DispositionCode>
+        <DispositionText>Speak to a primary care service within 2 hours</DispositionText>
+    </Consultation>
+    <Content mimeType="text/plain">Caller reports new confusion in 74-year-old with known
+type 2 diabetes. Reduced oral intake for 2 days. No chest pain, no focal weakness.
+Pathways assessment completed: PW1234 Confusion.
+
+Advice given: remain with patient, call back if drowsy or unrousable.
+Referred to in-hours GP for same-day assessment.</Content>
+</ITKMessage>

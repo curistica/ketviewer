@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ReportMsg SYSTEM "ReportMsg_EDT_03.dtd">
+<!-- SYNTHETIC TEST DATA. Invented patient, fictional places, and an NHS
+     number from the 999 000 0000-999 999 9999 range that NHS England
+     reserves for test data. Not a real person or record. -->
+<ReportMsg>
+    <!-- Message Routing and Metadata -->
+    <Header>
+        <MessageID>987654321-OOH-2026</MessageID>
+        <WorkflowID>OOH_ADASTRA</WorkflowID>
+        <SourceSystem>Adastra OOH Triage</SourceSystem>
+        <DestinationODS>X99999</DestinationODS> <!-- Recipient GP Practice Code -->
+        <CreationDateTime>2026-09-15T22:30:00</CreationDateTime>
+    </Header>
+
+    <!-- Patient Demographics for Record Matching -->
+    <Patient>
+        <NHSNumber>9990000018</NHSNumber>
+        <Surname>SMITH</Surname>
+        <Forenames>John</Forenames>
+        <DateOfBirth>1978-05-12</DateOfBirth>
+        <Gender>1</Gender> <!-- 1 for Male, 2 for Female -->
+        <Address>
+            <Line1>12 Example Lane</Line1>
+            <Town>Wellford</Town>
+            <Postcode>ZZ1 1AA</Postcode>
+        </Address>
+        <RegisteredGPCode>X99999</RegisteredGPCode>
+    </Patient>
+
+    <!-- Clinical Encounter Details -->
+    <Encounter>
+        <EncounterDateTime>2026-09-15T19:15:00</EncounterDateTime>
+        <ClinicianName>Dr. Jane Doe</ClinicianName>
+        <ClinicianType>GP Out of Hours</ClinicianType>
+        <PresentationType>Face-to-Face Consultation</PresentationType>
+    </Encounter>
+
+    <!-- The Clinical Payload (Often HTML or Base64 Encoded PDF) -->
+    <Payload contentType="text/html">
+        <![CDATA[
+        <h3>Out of Hours Summary Report</h3>
+        <p><strong>Reason for Contact:</strong> Acute exacerbation of asthma, presenting with worsening wheeze and breathlessness over 4 hours.</p>
+        <p><strong>Clinical Findings:</strong> Bilateral expiratory wheeze. Oxygen saturations 96% on room air. Heart rate 88 bpm.</p>
+        <p><strong>Management &amp; Treatment:</strong> Administered Salbutamol 5mg via nebuliser. Good response. Symptoms resolved.</p>
+        <p><strong>Medication Prescribed:</strong> Prednisolone 40mg once daily for 5 days.</p>
+        <p><strong>Action Required by Registered GP:</strong> For information only. Patient advised to book a routine review with the practice asthma nurse if symptoms recur.</p>
+        ]]>
+    </Payload>
+</ReportMsg>

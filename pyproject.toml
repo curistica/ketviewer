@@ -1,0 +1,16 @@
+[project]
+name = "ketviewer"
+version = "0.1.0"
+description = "Read and review .ket clinical messages (OOH, 111, community) locally."
+requires-python = ">=3.10"
+dependencies = []          # stdlib only, by design: nothing to install on a clinical machine
+
+[project.scripts]
+ketviewer = "ketviewer.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["ketviewer"]

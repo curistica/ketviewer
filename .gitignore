@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+
+# Never commit real patient data
+inbox/
+*.ket
+!samples/*.ket
