@@ -60,7 +60,14 @@ dd .raw{color:var(--muted);font-size:12px}
   margin:0}
 .notice{background:var(--warn-bg);color:var(--warn-ink);border-radius:8px;padding:10px 14px;
   font-size:13px;margin-bottom:16px}
-.attach{display:flex;flex-wrap:wrap;align-items:center;gap:12px;font-size:14px}
+.attach{display:flex;flex-wrap:wrap;align-items:center;gap:12px;font-size:14px;
+  margin-bottom:12px}
+.attach .desc{color:var(--muted)}
+a.btn.quiet{background:transparent;color:var(--accent);border:1px solid var(--line)}
+.viewer{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg)}
+.viewer iframe{display:block;width:100%;height:min(75vh,900px);border:0}
+.viewer img{display:block;max-width:100%;height:auto;margin:0 auto}
+.viewer .fallback{padding:14px;font-size:13px;color:var(--muted)}
 a.btn{background:var(--accent);color:#fff;text-decoration:none;padding:7px 14px;
   border-radius:7px;font-size:14px;display:inline-block}
 details{margin-top:8px}
@@ -124,8 +131,9 @@ def render_body(
             f"<pre class='xml'>{escape(raw_xml)}</pre></details>"
         )
     parts.append(
-        "<footer>Rendered locally by ketviewer — payload markup is sanitised "
-        "and no external resources are loaded.</footer>"
+        "<footer>Proof of concept — not for clinical use. Rendered locally by "
+        "ketviewer; payload markup is sanitised and no external resources are "
+        "loaded.</footer>"
     )
     return "".join(parts)
 
@@ -220,20 +228,75 @@ def _payload_body(
 def _attachment(
     payload: Payload, attachment_urls: dict[int, str] | None, embed: bool
 ) -> str:
+    """Show an attachment inline where the browser can render it safely."""
     name = f"attachment-{payload.index + 1}{payload.extension}"
     href = (attachment_urls or {}).get(payload.index)
+    # A same-origin URL means we are being served by the review server, which
+    # can stream the bytes; a standalone HTML file has to carry them inline.
+    served = href is not None
     if href is None and embed and payload.data is not None:
-        encoded = base64.b64encode(payload.data).decode("ascii")
-        href = f"data:{payload.content_type};base64,{encoded}"
-    link = (
-        f"<a class='btn' href='{escape(href, quote=True)}' download='{name}'>Open attachment</a>"
-        if href
-        else ""
-    )
-    return (
+        href = "data:{};base64,{}".format(
+            payload.content_type, base64.b64encode(payload.data).decode("ascii")
+        )
+    if href is None:
+        return f"<div class='attach'><span class='desc'>{escape(payload.description)}</span></div>"
+
+    safe_href = escape(href, quote=True)
+    buttons = [
+        f"<a class='btn' href='{safe_href}' download='{name}'>Download</a>",
+    ]
+    if served:
+        buttons.append(
+            f"<a class='btn quiet' href='{safe_href}' target='_blank' "
+            "rel='noreferrer noopener'>Open in new tab</a>"
+        )
+    bar = (
         "<div class='attach'>"
-        f"<span>{escape(payload.description)}</span>{link}</div>"
+        f"<span class='desc'>{escape(payload.description)}</span>{''.join(buttons)}</div>"
     )
+    return bar + _viewer(payload, safe_href, served)
+
+
+def _viewer(payload: Payload, safe_href: str, served: bool) -> str:
+    """Inline preview, for the types a browser renders without a plugin."""
+    content_type = payload.content_type.lower()
+
+    if "pdf" in content_type:
+        if not served:
+            # Browsers refuse to frame a data: URI, so a saved HTML file offers
+            # the download only.
+            return (
+                "<div class='viewer'><p class='fallback'>Open the PDF with the button "
+                "above, or run <code>ketviewer serve</code> to read it inline.</p></div>"
+            )
+        return (
+            f"<div class='viewer'><iframe src='{safe_href}' title='Attachment' "
+            "referrerpolicy='no-referrer'></iframe></div>"
+        )
+
+    if any(t in content_type for t in ("png", "jpeg", "jpg", "gif", "webp", "svg+xml")):
+        if "svg" in content_type:
+            # SVG is script-capable; never render it inline.
+            return (
+                "<div class='viewer'><p class='fallback'>SVG attachments are not "
+                "previewed, because they can carry script. Download it to view.</p></div>"
+            )
+        return (
+            f"<div class='viewer'><img src='{safe_href}' alt='Attachment {payload.index + 1}'>"
+            "</div>"
+        )
+
+    if content_type.startswith("text/") and payload.data is not None:
+        try:
+            text = payload.data.decode("utf-8")
+        except UnicodeDecodeError:
+            text = payload.data.decode("cp1252", "replace")
+        if "html" in content_type:
+            safe, _removed = sanitize_html(text)
+            return f"<div class='viewer'><div class='payload' style='padding:14px'>{safe}</div></div>"
+        return f"<div class='viewer'><div style='padding:14px'>{text_to_html(text)}</div></div>"
+
+    return ""
 
 
 def _section(section) -> str:

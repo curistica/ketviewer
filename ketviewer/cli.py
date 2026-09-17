@@ -149,11 +149,11 @@ def _list(args) -> int:
         return 0
     for entry in entries:
         if entry.record is None:
-            print(f"{entry.path.name:<32} !! {entry.error}")
+            print(f"{entry.name:<32} !! {entry.error}")
             continue
         record = entry.record
         print(
-            f"{entry.path.name:<32} "
+            f"{entry.name:<32} "
             f"{(format_datetime(record.encounter_datetime) or '—'):<22} "
             f"{record.patient_name:<28} "
             f"{(format_nhs_number(record.nhs_number) or '—'):<14} "

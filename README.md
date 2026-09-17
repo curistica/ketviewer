@@ -1,5 +1,10 @@
 # ketviewer
 
+> **Proof of concept.** Built to explore what a `.ket` reader could look like —
+> not a product, not a medical device, and not for clinical use. Nothing here
+> has been through clinical safety assurance under DCB0129/DCB0160. Do not
+> point it at a live inbox of real patient records.
+
 A local viewer for `.ket` clinical messages — the XML reports sent to a GP
 practice by out-of-hours, NHS 111, emergency department and community systems.
 
@@ -10,8 +15,8 @@ the machine: no dependencies, no network calls, no telemetry.
 ```bash
 python3 -m ketviewer view samples/sample_ooh.ket      # opens in your browser
 python3 -m ketviewer view samples/sample_ooh.ket --text
-python3 -m ketviewer serve /path/to/inbox             # review a whole folder
-python3 -m ketviewer list  /path/to/inbox             # one line per record
+python3 -m ketviewer serve samples                    # review a folder, or upload a file
+python3 -m ketviewer list  samples                    # one line per record
 ```
 
 Install it as a command (`ketviewer view …`) with `pip install -e .`, or just
@@ -31,8 +36,20 @@ than silently dropped. Field names are humanised for display (`NHSNumber` →
 **Finds the clinical content.** The payload — `<Payload>`, `<Content>`,
 `<Report>`, or any element with a `contentType`/`mimeType` attribute — is
 pulled to the top of the page. Inline HTML, plain text and base64 attachments
-(PDF, RTF, TIFF) are all handled; attachments are offered as a download and
-can be extracted with `view --save-attachments DIR`.
+are all handled.
+
+**Shows attachments in place.** Under `serve`, a base64 PDF is rendered in the
+page in the browser's own viewer, and PNG/JPEG/GIF/WebP images and text
+attachments likewise; anything else gets a download button. SVG is never
+previewed, because it can carry script. A standalone HTML file from `view`
+offers the download instead — browsers refuse to frame a `data:` URI — and
+`view --save-attachments DIR` writes them out as files.
+
+**Takes an upload.** The `serve` index page has a file picker: choose a `.ket`
+and it is parsed and displayed immediately. Uploads are held **in memory for
+the life of the process only** — never written to disk, gone when you stop the
+server — so a one-off file can be read without first copying it into the
+folder. The limit is 25 MB.
 
 **Checks what is checkable.** The NHS number is shown formatted with a modulus
 11 check-digit verification, and age at the encounter is derived from the date
@@ -51,8 +68,14 @@ These matter because the file comes from another organisation's system:
 - **Entity declarations are refused.** A message that declares its own XML
   entities is rejected rather than expanded ("billion laughs").
 - **The server binds to 127.0.0.1 only** and serves only the folder you point
-  it at, addressed by index rather than by path. Responses carry
-  `default-src 'none'` CSP, `no-store` and `no-referrer`.
+  it at, plus whatever you upload in the session. Records are addressed by an
+  opaque id, never by a path from the URL, so there is nothing to traverse.
+  Responses carry `no-store`, `no-referrer` and a CSP of `default-src 'none'`
+  with `frame-src 'self'` and `img-src 'self' data:` — just enough to show an
+  attachment from this server and nothing from anywhere else.
+- **Uploads never touch disk**, and the redirect after an upload uses the
+  record's opaque id, so a filename like `SMITH_John.ket` does not end up in
+  browser history.
 - Encoding is taken from the XML declaration, falling back to UTF-8 then
   CP1252, so `£` and accented names survive from older senders.
 
